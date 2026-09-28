@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Send, 
   CheckCircle, 
@@ -11,7 +11,10 @@ import {
   CloudDrizzle, 
   TrendingUp, 
   BarChart3, 
-  Users 
+  Users,
+  MessageCircle,
+  Bot,
+  X
 } from 'lucide-react';
 import { useLang } from '../context/LanguageContext';
 import { t } from '../i18n/translations';
@@ -32,6 +35,8 @@ const FeedbackPage = () => {
     const timer = setTimeout(() => setConfidence(82), 400);
     return () => clearTimeout(timer);
   }, []);
+
+
 
   const weatherOptions = [
     { id: 'rained', icon: CloudRain, label: t(lang, 'feedback.rained') || 'Rained', color: 'text-blue-500', activeBg: 'bg-blue-50', activeBorder: 'border-blue-500', ringColor: 'focus:ring-blue-500' },

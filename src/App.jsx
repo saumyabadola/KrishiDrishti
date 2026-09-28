@@ -7,6 +7,7 @@ import MapDashboard from './pages/MapDashboard';
 import FeedbackPage from './pages/FeedbackPage';
 import MethodologyPage from './pages/MethodologyPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ChatbotWidget from './components/ChatbotWidget';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <ChatbotWidget />
     </div>
   );
 }

@@ -1,4 +1,7 @@
-// ─────────────────────────────────────────────────────────────────────────────
+const fs = require('fs');
+const path = require('path');
+
+const fileContent = `// ─────────────────────────────────────────────────────────────────────────────
 // KrishiDrishti — All-India Comprehensive Agro-Meteorological Mock Data
 // 12 States × 2 Districts × 6 Blocks × 4 Panchayats = 576 Panchayats
 // Covering Himalayan, Indo-Gangetic, Central, Deccan, Ghats, Delta & Northeast
@@ -183,7 +186,7 @@ export const stateDefinitions = [
           { id: 'gondal', name: 'Gondal', nameHi: 'गोंडल', sector: [-0.2, -0.15], baseElev: 145, elevVar: 25, tempAdj: 0, rainAdj: 1, landTypes: ['irrigated_cropland','plantation','mixed_agriculture','rainfed_cropland'], pNames: [{name:'Derdi',nameHi:'देरडी'},{name:'Vasavad',nameHi:'वासवड़'},{name:'Gomta',nameHi:'गोमटा'},{name:'Ribda',nameHi:'रिबड़ा'}] },
           { id: 'jasdan', name: 'Jasdan', nameHi: 'जसदन', sector: [-0.05, 0.25], baseElev: 160, elevVar: 30, tempAdj: -1, rainAdj: 1, landTypes: ['rainfed_cropland','scrubland','mixed_agriculture','sparse_forest'], pNames: [{name:'Atkot',nameHi:'अतकोट'},{name:'Vinchhiya',nameHi:'विंछिया'},{name:'Sompipaliya',nameHi:'सोमपिपलिया'},{name:'Ghela Somnath',nameHi:'घेला सोमनाथ'}] },
           { id: 'dhoraji', name: 'Dhoraji', nameHi: 'धोराजी', sector: [-0.28, -0.2], baseElev: 120, elevVar: 18, tempAdj: 1, rainAdj: 0, landTypes: ['irrigated_cropland','rainfed_cropland','mixed_agriculture','plantation'], pNames: [{name:'Jamkandorna',nameHi:'जामकंडोरणा'},{name:'Upleta Road',nameHi:'उपलेटा रोड'},{name:'Chhatrasa',nameHi:'छत्रासा'},{name:'Patwa',nameHi:'पटवा'}] },
-          { id: 'padadhari', name: 'Padadhari', nameHi: 'पडाधरी', sector: [0.25, -0.2], baseElev: 130, elevVar: 15, tempAdj: 1, rainAdj: -1, landTypes: ['irrigated_cropland','mixed_agriculture','scrubland','rainfed_cropland'], pNames: [{name:'Targhadi',nameHi:'तरघडी'},{name:'Nyari',nameHi:'न्यरी'},{name:'Bodabhun',nameHi:'बोड़ाभुण'},{name:'Hadmatiya',nameHi:'हड़मतिया'}] },
+          { id: 'morbi_road', name: 'Padadhari', nameHi: 'पडाधरी', sector: [0.25, -0.2], baseElev: 130, elevVar: 15, tempAdj: 1, rainAdj: -1, landTypes: ['irrigated_cropland','mixed_agriculture','scrubland','rainfed_cropland'], pNames: [{name:'Targhadi',nameHi:'तरघडी'},{name:'Nyari',nameHi:'न्यरी'},{name:'Bodabhun',nameHi:'बोड़ाभुण'},{name:'Hadmatiya',nameHi:'हड़मतिया'}] },
           { id: 'kotda_sangani', name: 'Kotda Sangani', nameHi: 'कोटडा सांगाणी', sector: [-0.15, 0.15], baseElev: 150, elevVar: 22, tempAdj: 0, rainAdj: 0, landTypes: ['mixed_agriculture','irrigated_cropland','scrubland','plantation'], pNames: [{name:'Solsumba',nameHi:'सोलसुम्बा'},{name:'Anida',nameHi:'अनिडा'},{name:'Rajpara',nameHi:'राजपारा'},{name:'Mahuva Road',nameHi:'महुवा रोड'}] },
         ],
       },
@@ -430,11 +433,13 @@ export const stateDefinitions = [
 ];
 
 // ── Organic Land Boundary Generation ─────────────────────────────────────────
+// Generates natural, non-rectangular polygons anchored to geographic sector coordinates
 function makeOrganicPoly(centerLat, centerLng, radiusLat, radiusLng, seedOffset, numPoints = 12) {
   const coords = [];
   const startAngle = randRange(0, Math.PI / 4);
   for (let i = 0; i < numPoints; i++) {
     const angle = startAngle + (i / numPoints) * 2 * Math.PI;
+    // Harmonic modulation creates natural, curved river/ridge boundaries
     const harmonic1 = Math.sin(angle * 3 + seedOffset) * 0.18;
     const harmonic2 = Math.cos(angle * 2 - seedOffset) * 0.12;
     const noise = (rand() - 0.5) * 0.08;
@@ -444,6 +449,7 @@ function makeOrganicPoly(centerLat, centerLng, radiusLat, radiusLng, seedOffset,
     const lng = centerLng + Math.cos(angle) * radiusLng * r;
     coords.push([+(lng.toFixed(4)), +(lat.toFixed(4))]);
   }
+  // Close polygon
   coords.push(coords[0]);
   return coords;
 }
@@ -523,6 +529,7 @@ stateDefinitions.forEach((sd, sIdx) => {
     const bRadLng = lngSpan * 0.22;
 
     dd.blocks.forEach((bd, bIdx) => {
+      // Natural block centroid based on sector orientation within district
       const bCenterLat = dd.center[0] + bd.sector[0] * latSpan;
       const bCenterLng = dd.center[1] + bd.sector[1] * lngSpan;
       const bCoords = makeOrganicPoly(bCenterLat, bCenterLng, bRadLat, bRadLng, sIdx * 10 + dIdx * 5 + bIdx, 14);
@@ -535,14 +542,14 @@ stateDefinitions.forEach((sd, sIdx) => {
       const bWind = randInt(8, 22);
 
       const blockObj = {
-        id: `${dd.id}_${bd.id}`, blockId: bd.id, districtId: dd.id, stateId: sd.id,
+        id: \`\${dd.id}_\${bd.id}\`, blockId: bd.id, districtId: dd.id, stateId: sd.id,
         name: bd.name, nameHi: bd.nameHi, districtName: dd.name, districtNameHi: dd.nameHi,
         stateName: sd.name, stateNameHi: sd.nameHi, center: computedBCenter, elevation: bd.baseElev,
         forecast: { tempHigh: tH, tempLow: tL, rainfall: rain, humidity: bHumid, windSpeed: bWind },
         geojson: { 
           type: 'Feature', 
           properties: { 
-            id: `${dd.id}_${bd.id}`, 
+            id: \`\${dd.id}_\${bd.id}\`, 
             blockId: bd.id, 
             districtId: dd.id, 
             stateId: sd.id, 
@@ -567,6 +574,7 @@ stateDefinitions.forEach((sd, sIdx) => {
       };
       distBlockGeo.features.push(blockObj.geojson);
 
+      // Subdivide block into 4 organic panchayat territories
       const pRadLat = bRadLat * 0.48;
       const pRadLng = bRadLng * 0.48;
       const pOffsets = [[0.4, 0.4], [0.4, -0.4], [-0.4, -0.4], [-0.4, 0.4]];
@@ -592,10 +600,10 @@ stateDefinitions.forEach((sd, sIdx) => {
         const conf = randInt(68, 96);
         const pHumid = randInt(50, 90);
         const pWind = randInt(6, 24);
-        const pId = `${dd.id}_${bd.id}_${pn.name.toLowerCase().replace(/\s+/g, '_')}`;
+        const pId = \`\${dd.id}_\${bd.id}_\${pn.name.toLowerCase().replace(/\\\\s+/g, '_')}\`;
 
         const pObj = {
-          id: pId, blockId: `${dd.id}_${bd.id}`, districtId: dd.id, stateId: sd.id,
+          id: pId, blockId: \`\${dd.id}_\${bd.id}\`, districtId: dd.id, stateId: sd.id,
           blockName: bd.name, blockNameHi: bd.nameHi, districtName: dd.name, districtNameHi: dd.nameHi,
           stateName: sd.name, stateNameHi: sd.nameHi,
           name: pn.name, nameHi: pn.nameHi, center: computedPCenter, elevation: elev, landUse: lu, distToWater: dtw,
@@ -605,8 +613,8 @@ stateDefinitions.forEach((sd, sIdx) => {
             tempOffset: +(pTH - tH).toFixed(1), 
             rainfallOffset: +(pRain - rain).toFixed(1),
             factors: { 
-              elevation: { value: elev, effect: +(eEff).toFixed(1), label: `${elev}m` }, 
-              distToWater: { value: dtw, effect: +(wEff).toFixed(1), label: `${dtw} km` }, 
+              elevation: { value: elev, effect: +(eEff).toFixed(1), label: \`\${elev}m\` }, 
+              distToWater: { value: dtw, effect: +(wEff).toFixed(1), label: \`\${dtw} km\` }, 
               landUse: { value: lu, effect: +(lEff).toFixed(1) } 
             }
           },
@@ -622,7 +630,7 @@ stateDefinitions.forEach((sd, sIdx) => {
             id: pId, 
             name: pn.name, 
             nameHi: pn.nameHi, 
-            blockId: `${dd.id}_${bd.id}`, 
+            blockId: \`\${dd.id}_\${bd.id}\`, 
             blockName: bd.name, 
             blockNameHi: bd.nameHi, 
             districtName: dd.name,
@@ -697,7 +705,7 @@ for (let i = 0; i < 150; i++) {
   const p = allPanchayats[randInt(0, allPanchayats.length - 1)];
   const d = new Date(fbBase); d.setDate(d.getDate() + randInt(0, 26));
   feedbackData.push({ 
-    id: `fb_${i}`, panchayatId: p.id, panchayatName: p.name, blockName: p.blockName, 
+    id: \`fb_\${i}\`, panchayatId: p.id, panchayatName: p.name, blockName: p.blockName, 
     districtName: p.districtName, stateName: p.stateName, date: d.toISOString().split('T')[0], 
     event: pick(weatherEvents), notes: '', verified: rand() > 0.28 
   });
@@ -708,7 +716,7 @@ export function generateAccuracyTrend() {
   for (let d = 0; d < 30; d++) { 
     const dt = new Date(base); dt.setDate(dt.getDate() + d); 
     acc = Math.min(98, Math.max(62, acc + (rand() - 0.38) * 3.8));
-    data.push({ date: dt.toISOString().split('T')[0], dateShort: `${dt.getDate()}/${dt.getMonth() + 1}`, accuracy: +(acc.toFixed(1)), reports: randInt(6, 28) }); 
+    data.push({ date: dt.toISOString().split('T')[0], dateShort: \`\${dt.getDate()}/\${dt.getMonth() + 1}\`, accuracy: +(acc.toFixed(1)), reports: randInt(6, 28) }); 
   }
   return data;
 }
@@ -739,3 +747,7 @@ export const blocks = getDistrictBlocks('dehradun');
 export const panchayats = getDistrictPanchayats('dehradun');
 export const panchayatGeoJSON = getDistrict('dehradun')?.panchayatGeoJSON || { type: 'FeatureCollection', features: [] };
 export const blockGeoJSON = getDistrict('dehradun')?.blockGeoJSON || { type: 'FeatureCollection', features: [] };
+\`;
+
+fs.writeFileSync(path.join(__dirname, '..', 'src', 'data', 'mockData.js'), fileContent, 'utf8');
+console.log('Successfully generated comprehensive mockData.js with 12 states, 24 districts, organic polygons!');
