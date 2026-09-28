@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-500;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-lg rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply bg-sky-800 hover:bg-sky-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply bg-surface-200 hover:bg-surface-300 text-ink-800 font-medium px-5 py-2.5 rounded-xl transition-all duration-200;
+  }
+
+  .btn-accent {
+    @apply bg-crop-700 hover:bg-crop-600 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-info {
+    @apply badge bg-sky-500/10 text-sky-800;
+  }
+
+  .badge-success {
+    @apply badge bg-crop-500/10 text-crop-800;
+  }
+
+  .badge-warning {
+    @apply badge bg-earth-500/20 text-earth-900;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-500/10 text-red-700;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-surface-300 bg-white focus:border-sky-600 focus:ring-2 focus:ring-sky-600/20 outline-none transition-all duration-200 text-ink-800 placeholder:text-ink-400;
+  }
+
+  .section-title {
+    @apply text-2xl sm:text-3xl font-bold text-ink-900;
+  }
+
+  .section-subtitle {
+    @apply text-ink-600 text-lg mt-2;
+  }
+
+  /* Leaflet overrides */
+  .leaflet-container {
+    @apply rounded-2xl font-sans;
+    background: #f0ede6;
+  }
+
+  .leaflet-popup-content-wrapper {
+    @apply rounded-xl shadow-lg border border-surface-200;
+  }
+
+  .leaflet-popup-content {
+    @apply font-sans text-sm text-ink-800 m-0 p-3;
+  }
+
+  .leaflet-control-zoom a {
+    @apply text-ink-800 border-surface-300;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-sky-800 via-crop-700 to-earth-700;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
